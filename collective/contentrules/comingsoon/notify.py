@@ -4,10 +4,12 @@ from DateTime import DateTime
 from ZODB.POSException import ConflictError
 from zope.component import getUtility
 from zope.event import notify
+from zope.interface import alsoProvides
 from zope.publisher.publish import mapply
 
 from plone import api
 from plone.registry.interfaces import IRegistry
+from plone.protect.interfaces import IDisableCSRFProtection
 from Products.Five.browser import BrowserView
 
 from collective.contentrules.comingsoon.interfaces import IComingSoonSettings
@@ -21,7 +23,9 @@ class NotifyComingSoon(BrowserView):
     """View that notifies contents that are coming soon,
     so that launches IComingSoon rules
     """
+
     def __call__(self):
+        alsoProvides(self.request, IDisableCSRFProtection)
         return mapply(self.notify, (), self.request)
 
     def notify(self, index='start'):
